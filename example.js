@@ -1,3 +1,4 @@
+import fs from "fs";
 import puppeteer from "puppeteer";
 
 (async () => {
@@ -20,11 +21,23 @@ import puppeteer from "puppeteer";
   // await page.click(searchResultSelector);
 
   // Locate the full title with a unique string
-  const textSelector = await page.waitForSelector(".show-all-results-upsell");
-  const fullTitle = await textSelector?.evaluate((el) => el.textContent);
+  // const textSelector = await page.waitForSelector(".show-all-results-upsell");
+  // const fullTitle = await textSelector?.evaluate((el) => el.textContent);
+
+  const tableContent = await page.$$eval(
+    "div.body-wrapper > grid-row",
+    (rows) => {
+      return Array.from(rows, (row) => {
+        const column = row.querySelectorAll("grid-cell");
+        return Array.from(column, (col) => {
+          return col.textContent.trim();
+        });
+      });
+    }
+  );
 
   // Print the full title
-  console.log('The title of this blog post is "%s".', fullTitle);
+  console.log(tableContent);
 
   await browser.close();
 })();
